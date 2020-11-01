@@ -1,6 +1,11 @@
 // uncomment this to hide the console
 // #![windows_subsystem = "windows"]
 pub mod com;
+pub mod game_timer;
+pub mod events;
+pub mod ui;
+
+mod device_resources;
 
 use std::ffi::OsStr;
 use std::os::windows::ffi::OsStrExt;
@@ -55,8 +60,6 @@ use winapi::um::winuser::{
     PeekMessageW,
     PM_REMOVE
 };
-
-mod device_resources;
 
 fn win32_string(value: &str ) -> Vec<u16> {
     OsStr::new(value).encode_wide().chain(once(0)).collect()
@@ -134,6 +137,10 @@ fn main() {
     dr.set_window(window.handle, 1400, 900);
     dr.create_device_resources();
     dr.create_window_size_dependent_resources();
+
+    // should this be a static/global variable somewhere?
+    let game_timer = game_timer::GameTimer::new();
+    let event_handler = events::EventHandler::new();
     
     unsafe {
         let mut msg: MSG = mem::uninitialized();
